@@ -42,4 +42,3 @@ admin.site.register(AcademicInfo, AcademicInfoAdmin)
 admin.site.register(EducationLevel, EducationLevelAdmin)
 admin.site.register(Degree, DegreeAdmin)
 admin.site.register(Board, BoardAdmin)
-

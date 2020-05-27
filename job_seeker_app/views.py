@@ -5,6 +5,7 @@ from django.views.decorators.http import require_http_methods
 
 from .models import *
 
+
 # Create your views here.
 
 
@@ -20,7 +21,7 @@ def professional_information(request):
     return JsonResponse(pro_info, safe=False)
 
 
-# Add PersonalInf
+# Add PersonalInfo
 @csrf_exempt
 @require_http_methods(["POST"])
 def create_personal_info(request):
@@ -61,10 +62,56 @@ def create_personal_info(request):
     return JsonResponse(str(data), safe=False)
 
 
-# Delete PersonalInf
+# Delete PersonalInfo
 @csrf_exempt
-def delete_professional_info(request, id):
+def delete_personal_info(request, id):
     personal_info = get_object_or_404(PersonalInfo, id=id)
     if request.method == "POST":
         personal_info.delete()
+    return JsonResponse({'massage': 'delete successfully'}, status=204)
+
+
+# Add ProfessionalInfo
+@csrf_exempt
+@require_http_methods(["POST"])
+def create_professional_info(request):
+    import json
+    body_unicode = request.body.decode('utf-8')
+    body_data = json.loads(body_unicode)
+    print(body_data)
+
+    company_name = body_data['company_name']
+    company_type = body_data['company_type']
+    employee_id = body_data['employee_id']
+    designation = body_data['designation']
+    department = body_data['department']
+    responsibilities = body_data['responsibilities']
+    company_location = body_data['company_location']
+    employment_period = body_data['employment_period']
+    user = body_data['user']
+    print(user)
+
+    custom_user = CustomUser.objects.get(id=user)
+    print(custom_user)
+
+    data = ProfessionalInfo.objects.create(
+        company_name=company_name,
+        company_type=company_type,
+        employee_id=employee_id,
+        designation=designation,
+        department=department,
+        responsibilities=responsibilities,
+        company_location=company_location,
+        employment_period=employment_period,
+        user=custom_user
+    )
+    return JsonResponse(str(data), safe=False)
+
+
+# Delete ProfessionalInfo
+@csrf_exempt
+def delete_professional_info(request, id):
+    professional_info = get_object_or_404(ProfessionalInfo, id=id)
+    if request.method == "POST":
+        professional_info.delete()
     return JsonResponse({'massage': 'delete successfully'}, status=204)
