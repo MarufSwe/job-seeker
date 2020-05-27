@@ -6,11 +6,11 @@ from .models import *
 # Register your models here.
 
 class UserAdmin(admin.ModelAdmin):
-    list_display = ['user_name', 'password']
+    list_display = ['id', 'user_name', 'password']
 
 
 class PersonalInfoAdmin(admin.ModelAdmin):
-    list_display = ['first_name', 'last_name', 'age', 'mobile', 'email', 'father_name', 'mother_name',
+    list_display = ['id', 'first_name', 'last_name', 'mobile', 'email', 'father_name', 'mother_name',
                     'gender', 'religion', 'nid', 'dob']
 
 
@@ -20,7 +20,7 @@ class ProfessionalInfoAdmin(admin.ModelAdmin):
 
 
 class EducationLevelAdmin(admin.ModelAdmin):
-    list_display = ['edu_level_name']
+    list_display = ['name']
 
 
 class DegreeAdmin(admin.ModelAdmin):
@@ -32,10 +32,10 @@ class BoardAdmin(admin.ModelAdmin):
 
 
 class AcademicInfoAdmin(admin.ModelAdmin):
-    list_display = ['result', 'year_from', 'year_to', 'institute_name']
+    list_display = ['user', 'degree', 'board', 'institute_name', 'result', 'year_from', 'year_to']
 
 
-admin.site.register(User, UserAdmin)
+admin.site.register(CustomUser, UserAdmin)
 admin.site.register(PersonalInfo, PersonalInfoAdmin)
 admin.site.register(ProfessionalInfo, ProfessionalInfoAdmin)
 admin.site.register(AcademicInfo, AcademicInfoAdmin)
