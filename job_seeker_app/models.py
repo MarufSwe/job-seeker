@@ -60,15 +60,13 @@ class Professionals(models.Model):
 
     organization_name = models.CharField(max_length=100)
     organization_type = models.CharField(max_length=50, default=True, choices=OrganizationType.choices)
-    employee_id = models.AutoField(primary_key=True)
     department = models.CharField(max_length=50, default=True, choices=Department.choices)
     designation = models.CharField(max_length=100)
     responsibilities = models.CharField(max_length=100)
-    employment_from = models.DateField(null=False, default=False)
-    employment_to = models.DateField(null=False, default=False)
-    employment_period = models.DurationField()
+    employment_from = models.DateField(default=False, null=True, blank=True)
+    employment_to = models.DateField(default=False, null=True, blank=True)
     company_location = models.CharField(max_length=100)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         # ordering = ['-id']

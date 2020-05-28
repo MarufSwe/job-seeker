@@ -1,0 +1,4 @@
+##1. Registration
+
+# Endpoint: {{host}} / api /signup
+# METHOD: POST
