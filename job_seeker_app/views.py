@@ -21,13 +21,6 @@ def personal_information(request):
     return JsonResponse(per_info, safe=False)
 
 
-# Professional Info List
-# http://127.0.0.1:8000/professional_info/
-def professional_information(request):
-    pro_info = {'pro_info': list(ProfessionalInfo.objects.values())}
-    return JsonResponse(pro_info, safe=False)
-
-
 # Add PersonalInfo
 # http://127.0.0.1:8000/add_per_info/
 @csrf_exempt
@@ -51,7 +44,7 @@ def create_personal_info(request):
     user = body_data['user']
     print(user)
 
-    custom_user = CustomUser.objects.get(id=user)
+    custom_user = User.objects.get(id=user)
     print(custom_user)
 
     data = PersonalInfo.objects.create(
@@ -140,6 +133,14 @@ def delete_personal_info(request, id):
 
 # ===============================================Professional Info===============================================
 
+
+# Professional Info List
+# http://127.0.0.1:8000/professional_info/
+def professional_information(request):
+    pro_info = {'pro_info': list(ProfessionalInfo.objects.values())}
+    return JsonResponse(pro_info, safe=False)
+
+
 # Add ProfessionalInfo
 # http://127.0.0.1:8000/add_pro_info/
 @csrf_exempt
@@ -161,7 +162,7 @@ def create_professional_info(request):
     user = body_data['user']
     print(user)
 
-    custom_user = CustomUser.objects.get(id=user)
+    custom_user = User.objects.get(id=user)
     print(custom_user)
 
     data = ProfessionalInfo.objects.create(
@@ -284,7 +285,7 @@ def degree_name(request):
     return JsonResponse(degree, safe=False)
 
 
-# Add PersonalInfo
+# Add Degree
 # http://127.0.0.1:8000/add_degree/
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -294,10 +295,6 @@ def create_degree(request):
     body_data = json.loads(body_unicode)
 
     degree_name = body_data['degree_name']
-
-    custom_user = Degree.objects.get()
-    print(custom_user)
-
     data = Degree.objects.create(
         degree_name=degree_name,
     )
@@ -362,12 +359,12 @@ def create_academic_info(request):
     board = body_data['board']
     user = body_data['user']
 
-    custom_user = CustomUser.objects.get(id=user)
+    custom_user = User.objects.get(id=user)
     print(custom_user)
     foreign_degree = Degree.objects.get(id=degree)
     print(degree)
     board_name = Board.objects.get(id=board)
-    print(board_name)
+    # print(board_name)
 
     data = AcademicInfo.objects.create(
         result=result,
@@ -423,3 +420,36 @@ def delete_academic_info(request, id):
     if request.method == "POST":
         academic.delete()
     return JsonResponse({'massage': 'delete successfully'}, status=204, safe=False)
+
+
+# =========================================Registration================================
+
+# Register JobSeeker List
+# http://127.0.0.1:8000/seeker_list
+def job_seeker_list(request):
+    register_seeker_list = {'register_seeker_list': list(User.objects.values())}
+    return JsonResponse(register_seeker_list, safe=False)
+
+
+# JobSeeker Registration
+# http://127.0.0.1:8000/registration
+@method_decorator(csrf_exempt, name='dispatch')
+class JobSeekerRegistration(View):
+    def post(self, request):
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+
+        first_name = body['first_name']
+        last_name = body['last_name']
+        email = body['email']
+        username = body['username']
+        password = body['password']
+
+        User.objects.create(
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            username=username,
+            password=password,
+        )
+        return JsonResponse({'message': 'Registration Successful!'}, status=201, safe=False)

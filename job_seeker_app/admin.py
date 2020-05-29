@@ -5,8 +5,8 @@ from .models import *
 
 # Register your models here.
 
-class UserAdmin(admin.ModelAdmin):
-    list_display = ['id', 'user_name', 'password']
+# class UserAdmin(admin.ModelAdmin):
+#     list_display = ['id', 'user_name', 'password']
 
 
 class PersonalInfoAdmin(admin.ModelAdmin):
@@ -35,7 +35,7 @@ class AcademicInfoAdmin(admin.ModelAdmin):
     list_display = ['user', 'degree', 'board', 'institute_name', 'result', 'year_from', 'year_to']
 
 
-admin.site.register(CustomUser, UserAdmin)
+# admin.site.register(CustomUser, UserAdmin)
 admin.site.register(PersonalInfo, PersonalInfoAdmin)
 admin.site.register(ProfessionalInfo, ProfessionalInfoAdmin)
 admin.site.register(AcademicInfo, AcademicInfoAdmin)

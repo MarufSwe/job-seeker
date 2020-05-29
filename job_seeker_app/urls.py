@@ -1,7 +1,6 @@
 from django.urls import path, include
 from . import views
-from .views import UpdateProfessionalInfo, UpdatePersonalInfo, UpdateDegree, UpdateAcademicInfo
-
+from .views import *
 urlpatterns = [
     path('personal_info/', views.personal_information),
     path('add_per_info/', views.create_personal_info),
@@ -22,6 +21,9 @@ urlpatterns = [
     path('add_academic_info/', views.create_academic_info),
     path('update_academic/<int:id>/', UpdateAcademicInfo.as_view()),
     path('del_academic/<int:id>/', views.delete_academic_info),
+
+    path('registration/', JobSeekerRegistration.as_view()),
+    path('seeker_list/', views.job_seeker_list),
 
 ]
 
