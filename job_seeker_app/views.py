@@ -334,3 +334,92 @@ def delete_degree(request, id):
     if request.method == "POST":
         degree.delete()
     return JsonResponse({'massage': 'delete successfully'}, status=204)
+
+
+# ===============================================Academic Info===============================================
+
+# AcademicInfo List
+# http://127.0.0.1:8000/academic_info
+def academic_info_list(request):
+    academic_info = {'academic_info': list(AcademicInfo.objects.values())}
+    return JsonResponse(academic_info, safe=False)
+
+
+# Add AcademicInfo
+# http://127.0.0.1:8000/add_academic_info/
+@csrf_exempt
+@require_http_methods(["POST"])
+def create_academic_info(request):
+    import json
+    body_unicode = request.body.decode('utf-8')
+    body_data = json.loads(body_unicode)
+
+    result = body_data['result']
+    year_from = body_data['year_from']
+    year_to = body_data['year_to']
+    institute_name = body_data['institute_name']
+    degree = body_data['degree']
+    board = body_data['board']
+    user = body_data['user']
+
+    custom_user = CustomUser.objects.get(id=user)
+    print(custom_user)
+    foreign_degree = Degree.objects.get(id=degree)
+    print(degree)
+    board_name = Board.objects.get(id=board)
+    print(board_name)
+
+    data = AcademicInfo.objects.create(
+        result=result,
+        year_from=year_from,
+        year_to=year_to,
+        institute_name=institute_name,
+        degree=foreign_degree,
+        board=board_name,
+        user=custom_user
+    )
+    return JsonResponse(str(data), safe=False)
+
+
+# Update Academic Info
+# http://127.0.0.1:8000/update_academic/
+@method_decorator(csrf_exempt, name='dispatch')
+class UpdateAcademicInfo(View):
+    def put(self, request, id=id):
+        try:
+            body_unicode = request.body.decode('utf-8')
+            body = json.loads(body_unicode)
+
+            result = body['result']
+            year_from = body['year_from']
+            year_to = body['year_to']
+            institute_name = body['institute_name']
+
+            exist_academic = get_object_or_404(AcademicInfo, id=id)
+
+            exist_academic.result = result
+            exist_academic.save()
+
+            exist_academic.year_from = year_from
+            exist_academic.save()
+
+            exist_academic.year_to = year_to
+            exist_academic.save()
+
+            exist_academic.institute_name = institute_name
+            exist_academic.save()
+
+            return JsonResponse({"message": "updated"}, status=201, safe=False)
+
+        except AcademicInfo.DoesNotExist as e:
+            return JsonResponse({"message": e}, status=404, safe=False)
+
+
+# Delete Degree
+# http://127.0.0.1:8000/del_degree
+@csrf_exempt
+def delete_academic_info(request, id):
+    academic = get_object_or_404(AcademicInfo, id=id)
+    if request.method == "POST":
+        academic.delete()
+    return JsonResponse({'massage': 'delete successfully'}, status=204, safe=False)

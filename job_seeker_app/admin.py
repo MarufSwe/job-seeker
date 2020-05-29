@@ -24,11 +24,11 @@ class EducationLevelAdmin(admin.ModelAdmin):
 
 
 class DegreeAdmin(admin.ModelAdmin):
-    list_display = ['degree_name']
+    list_display = ['id', 'degree_name']
 
 
 class BoardAdmin(admin.ModelAdmin):
-    list_display = ['board_name']
+    list_display = ['id', 'board_name']
 
 
 class AcademicInfoAdmin(admin.ModelAdmin):
