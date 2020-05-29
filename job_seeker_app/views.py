@@ -4,9 +4,9 @@ from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.shortcuts import get_object_or_404
-import jwt, json
-from rest_framework import views
-from rest_framework.response import Response
+import json
+# from rest_framework import views
+# from rest_framework.response import Response
 
 from .models import (
     Personals,
