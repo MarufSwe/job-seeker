@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from .views import (
+
     ViewProfessionalsList,
     ViewProfessionalsAdd,
     ViewProfessionalsUpdate,
@@ -19,7 +20,6 @@ from .views import (
 urlpatterns = [
 
     path('registration/', ViewUserRegistration.as_view()),
-
     path('api/professionals-list/', ViewProfessionalsList.as_view()),
     path('api/professionals-add/', ViewProfessionalsAdd.as_view()),
     path('api/professionals-update/<int:id>', ViewProfessionalsUpdate.as_view()),

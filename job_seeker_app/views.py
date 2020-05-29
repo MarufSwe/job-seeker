@@ -1,10 +1,12 @@
-import json
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views import View
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.shortcuts import get_object_or_404
+import jwt, json
+from rest_framework import views
+from rest_framework.response import Response
 
 from .models import (
     Personals,
@@ -13,6 +15,39 @@ from .models import (
     Degree,
 
 )
+
+#
+# class Login(views.APIView):
+#
+#     def post(self, request):
+#         if not request.data:
+#             return Response({'Error': "Please provide username/password"}, status="400")
+#
+#         username = request.data['username']
+#         password = request.data['password']
+#         try:
+#             user = User.objects.get(username=username, password=password)
+#             print(user)
+#         except User.DoesNotExist:
+#             return Response({'Error': "Invalid username/password"}, status="400")
+#         if user:
+#             payload = {
+#                 'id': user.id,
+#                 'email': user.email,
+#             }
+#             jwt_token = {'token': jwt.encode(payload, "SECRET_KEY")}
+#
+#             return HttpResponse(
+#                 json.dumps(jwt_token),
+#                 status=200,
+#                 content_type="application/json"
+#         )
+#         else:
+#             return Response(
+#             json.dumps({'Error': "Invalid credentials"}),
+#             status=400,
+#             content_type="application/json"
+#         )
 
 
 @method_decorator(csrf_exempt, name='dispatch')
