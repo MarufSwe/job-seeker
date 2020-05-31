@@ -22,8 +22,8 @@ urlpatterns = [
     path('update_academic/<int:id>/', UpdateAcademicInfo.as_view()),
     path('del_academic/<int:id>/', views.delete_academic_info),
 
-    path('registration/', JobSeekerRegistration.as_view()),
     path('seeker_list/', views.job_seeker_list),
+    path('registration/', JobSeekerRegistration.as_view()),
 
 ]
 
