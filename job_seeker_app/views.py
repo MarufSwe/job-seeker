@@ -1,5 +1,6 @@
 import json
 
+from django.contrib.auth import authenticate
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.utils.decorators import method_decorator
@@ -11,6 +12,107 @@ from .models import *
 
 
 # Create your views here.
+
+# =========================================Registration================================
+
+# JobSeeker Registration
+# http://127.0.0.1:8000/registration
+@method_decorator(csrf_exempt, name='dispatch')
+class JobSeekerRegistration(View):
+    def post(self, request):
+
+        # getting api data
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+
+        username = body['username']
+        email = body['email']
+        password = body['password']
+        first_name = body['first_name']
+        last_name = body['last_name']
+
+        # user creation
+        User.objects.create(
+            username=username,
+            email=email,
+            password=password,
+            first_name=first_name,
+            last_name=last_name,
+        )
+        return JsonResponse({'message': 'Registration Successful!'}, status=201, safe=False)
+
+
+# Login
+# http://127.0.0.1:8000/login/
+@csrf_exempt
+@require_http_methods(["POST"])
+def login(request):
+    # getting api data
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+
+    username = body['username']
+    password = body['password']
+
+    # if data available
+    if username and password:
+
+        # checking
+        authenticated = authenticate(username=username, password=password)
+
+        # if authenticated user
+        if authenticated:
+            # generating token
+            token = generate_token()
+
+            # creating object
+            Token.objects.create(user=authenticated, token=token)
+
+            # if succeed
+            return JsonResponse({'token': token}, status=200)
+
+        # if not succeed
+        else:
+            return JsonResponse({'message': 'Login Failed!'}, status=401)
+
+    # if data not available
+    else:
+        return JsonResponse({'message': 'Not Found!'}, status=404)
+
+
+# Logout
+# http://127.0.0.1:8000/logout/
+def logout(request):
+    # getting token
+    token = request.headers['Token']
+
+    # if token available
+    if token:
+        # matching api token with db token
+        matched_token = Token.objects.get(token=token)
+        # deleting db token
+        matched_token.delete()
+
+        # if succeed
+        return JsonResponse({'message': 'Logout Successfully!'}, status=200)
+
+    # if not succeed
+    else:
+        return JsonResponse({'message': 'Not Found!'}, status=404)
+
+
+# custom token generating
+def generate_token():
+    import time
+    return str(int(time.time()))
+
+
+# Register JobSeeker List
+# http://127.0.0.1:8000/seeker_list
+def job_seeker_list(request):
+    register_seeker_list = {'register_seeker_list': list(User.objects.values())}
+    return JsonResponse(register_seeker_list, safe=False)
+
 
 # ===========================================Personal Info============================================
 
@@ -27,9 +129,9 @@ def personal_information(request):
 @require_http_methods(["POST"])
 def create_personal_info(request):
     import json
+    # getting api data
     body_unicode = request.body.decode('utf-8')
     body_data = json.loads(body_unicode)
-    print(body_data)
 
     first_name = body_data['first_name']
     last_name = body_data['last_name']
@@ -69,6 +171,7 @@ def create_personal_info(request):
 class UpdatePersonalInfo(View):
     def put(self, request, id=id):
         try:
+            # getting api data
             body_unicode = request.body.decode('utf-8')
             body = json.loads(body_unicode)
 
@@ -412,44 +515,11 @@ class UpdateAcademicInfo(View):
             return JsonResponse({"message": e}, status=404, safe=False)
 
 
-# Delete Degree
-# http://127.0.0.1:8000/del_degree
+# Delete Academic info
+# http://127.0.0.1:8000/del_academic
 @csrf_exempt
 def delete_academic_info(request, id):
     academic = get_object_or_404(AcademicInfo, id=id)
     if request.method == "POST":
         academic.delete()
     return JsonResponse({'massage': 'delete successfully'}, status=204, safe=False)
-
-
-# =========================================Registration================================
-
-# Register JobSeeker List
-# http://127.0.0.1:8000/seeker_list
-def job_seeker_list(request):
-    register_seeker_list = {'register_seeker_list': list(User.objects.values())}
-    return JsonResponse(register_seeker_list, safe=False)
-
-
-# JobSeeker Registration
-# http://127.0.0.1:8000/registration
-@method_decorator(csrf_exempt, name='dispatch')
-class JobSeekerRegistration(View):
-    def post(self, request):
-        body_unicode = request.body.decode('utf-8')
-        body = json.loads(body_unicode)
-
-        first_name = body['first_name']
-        last_name = body['last_name']
-        email = body['email']
-        username = body['username']
-        password = body['password']
-
-        User.objects.create(
-            first_name=first_name,
-            last_name=last_name,
-            email=email,
-            username=username,
-            password=password,
-        )
-        return JsonResponse({'message': 'Registration Successful!'}, status=201, safe=False)

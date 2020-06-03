@@ -2,11 +2,12 @@ from django.contrib import admin
 
 from .models import *
 
-
 # Register your models here.
 
-# class UserAdmin(admin.ModelAdmin):
-#     list_display = ['id', 'user_name', 'password']
+
+@admin.register(Token)
+class TokenAdmin(admin.ModelAdmin):
+    list_display = ['id', 'user', 'token']
 
 
 class PersonalInfoAdmin(admin.ModelAdmin):
