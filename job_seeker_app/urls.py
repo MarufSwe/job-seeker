@@ -6,7 +6,6 @@ from .views import (
     ViewProfessionalsAdd,
     ViewProfessionalsUpdate,
     ViewProfessionalsDelete,
-    ViewUserRegistration,
     ViewPersonalsList,
     ViewPersonalsAdd,
     ViewPersonalsUpdate,
@@ -16,10 +15,18 @@ from .views import (
     ViewAcademicsUpdate,
     ViewAcademicsDelete,
 )
+from .views import login, logout, sign_up
 
 urlpatterns = [
+    # sign-up api
+    path('sign-up/', sign_up),
 
-    path('registration/', ViewUserRegistration.as_view()),
+    # login api
+    path('login/', login),
+
+    # logout api
+    path('logout/', logout),
+
     path('api/professionals-list/', ViewProfessionalsList.as_view()),
     path('api/professionals-add/', ViewProfessionalsAdd.as_view()),
     path('api/professionals-update/<int:id>', ViewProfessionalsUpdate.as_view()),

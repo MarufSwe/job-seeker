@@ -1,13 +1,16 @@
-from django.http import JsonResponse, HttpResponse
-from django.views import View
-from django.contrib.auth.models import User
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
-from django.shortcuts import get_object_or_404
 import json
-# from rest_framework import views
-# from rest_framework.response import Response
-# okk
+
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from django.utils.decorators import method_decorator
+from django.views import View
+# from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+# from oauthlib.common import generate_token
+
 from .models import (
     Personals,
     Professionals,
@@ -15,6 +18,112 @@ from .models import (
     Degree,
 
 )
+from .models import Token
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def sign_up(request):
+    # getting api data
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+
+    username = body['username']
+    email = body['email']
+    password = body['password']
+    first_name = body['first_name']
+    last_name = body['last_name']
+
+    # if data available
+    if username and email and password and first_name and last_name:
+        # user creation
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password,
+            first_name=first_name,
+            last_name=last_name,
+        )
+
+        # modifying data to json format
+        user_data = {
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+        }
+
+        # return api response
+        return JsonResponse(user_data, status=201)
+
+    # if data not available
+    else:
+        return JsonResponse({'message': 'Signup Failed!'}, status=404)
+
+
+# login api
+@csrf_exempt
+@require_http_methods(["POST"])
+def login(request):
+    # getting api data
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+
+    username = body['username']
+    password = body['password']
+
+    # if data available
+    if username and password:
+
+        # checking
+        authenticated = authenticate(username=username, password=password)
+
+        # if authenticated user
+        if authenticated:
+            # generating token
+            token = generate_token()
+
+            # creating object
+            Token.objects.create(user=authenticated, token=token)
+
+            # if succeed
+            return JsonResponse({'token': token}, status=200)
+
+        # if not succeed
+        else:
+            return JsonResponse({'message': 'Login Failed!'}, status=401)
+
+    # if data not available
+    else:
+        return JsonResponse({'message': 'Not Found!'}, status=404)
+
+
+# logout api
+def logout(request):
+    # getting token
+    token = request.headers['Token']
+
+    # if token available
+    if token:
+        # matching api token with db token
+        matched_token = Token.objects.get(token=token)
+        # deleting db token
+        matched_token.delete()
+
+        # if succeed
+        return JsonResponse({'message': 'Logout Successfully!'}, status=200)
+
+    # if not succeed
+    else:
+        return JsonResponse({'message': 'Not Found!'}, status=404)
+
+
+# custom token generating
+def generate_token():
+    import time
+
+    return str(int(time.time()))
+
 
 #
 # class Login(views.APIView):
@@ -50,32 +159,89 @@ from .models import (
 #         )
 
 
-@method_decorator(csrf_exempt, name='dispatch')
-class ViewUserRegistration(View):
-    def post(self, request):
-
-        body_unicode = request.body.decode('utf-8')
-        body = json.loads(body_unicode)
-
-        id = body['id']
-        username = body['username']
-        password = body['password']
-        email = body['email']
-        first_name = body['first_name']
-        last_name = body['last_name']
-
-        if id and username and password and email and first_name and last_name:
-            User.objects.create(
-                id=id,
-                username=username,
-                password=password,
-                email=email,
-                first_name=first_name,
-                last_name=last_name,
-            )
-            return JsonResponse({'message': 'Registration Successfully Complete !'}, status=201, safe=False)
-        else:
-            return JsonResponse({"message": " Data Not Found!"}, status=404, safe=False)
+# @method_decorator(csrf_exempt, name='dispatch')
+# class ViewUserRegistration(View):
+#     def post(self, request):
+#
+#         body_unicode = request.body.decode('utf-8')
+#         body = json.loads(body_unicode)
+#
+#         username = body['username']
+#         email = body['email']
+#         password = body['password']
+#
+#         first_name = body['first_name']
+#         last_name = body['last_name']
+#
+#         if username and password and email and first_name and last_name:
+#             User.objects.create_user(
+#
+#                 username=username,
+#                 password=password,
+#                 email=email,
+#                 first_name=first_name,
+#                 last_name=last_name,
+#             )
+#             return JsonResponse({'message': 'Registration Successfully Complete !'}, status=201, safe=False)
+#         else:
+#             return JsonResponse({"message": " Data Not Found!"}, status=404, safe=False)
+#
+#
+# @csrf_exempt
+# @require_http_methods(["POST"])
+# def login(request):
+#     # getting api data
+#     body_unicode = request.body.decode('utf-8')
+#     body = json.loads(body_unicode)
+#
+#     username = body['username']
+#     password = body['password']
+#
+#     # if data available
+#     if username and password:
+#
+#         # checking
+#         authenticated = authenticate(username=username, password=password)
+#
+#         # if authenticated user
+#         if authenticated:
+#
+#             # if succeed
+#             return JsonResponse({'authenticated': 'Login successfully done'}, status=200)
+#
+#         # if not succeed
+#         else:
+#             return JsonResponse({'message': 'Login Failed!'}, status=401)
+#
+#     # if data not available
+#     else:
+#         return JsonResponse({'message': 'Not Found!'}, status=404)
+#
+#
+# # logout api
+# def logout(request):
+#     # getting token
+#     token = request.headers['Token']
+#
+#     # if token available
+#     if token:
+#         # matching api token with db token
+#         matched_token = User.objects.get(token=token)
+#         # deleting db token
+#         matched_token.delete()
+#
+#         # if succeed
+#         return JsonResponse({'message': 'Logout Successfully!'}, status=200)
+#
+#     # if not succeed
+#     else:
+#         return JsonResponse({'message': 'Not Found!'}, status=404)
+#
+#
+# def generate_token():
+#     import time
+#
+#     return str(int(time.time()))
 
 
 # Professionals API CRUD
