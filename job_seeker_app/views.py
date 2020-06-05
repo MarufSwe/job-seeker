@@ -7,6 +7,8 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from .forms import UserForm
+from .helpers import json_body
 
 from .models import *
 
@@ -20,26 +22,14 @@ from .models import *
 @method_decorator(csrf_exempt, name='dispatch')
 class JobSeekerRegistration(View):
     def post(self, request):
-
         # getting api data
-        body_unicode = request.body.decode('utf-8')
-        body = json.loads(body_unicode)
-
-        username = body['username']
-        email = body['email']
-        password = body['password']
-        first_name = body['first_name']
-        last_name = body['last_name']
-
-        # user creation
-        User.objects.create(
-            username=username,
-            email=email,
-            password=password,
-            first_name=first_name,
-            last_name=last_name,
-        )
-        return JsonResponse({'message': 'Registration Successful!'}, status=201, safe=False)
+        # body = json_body(request)
+        seeker_form = UserForm(json_body(request))
+        if seeker_form.is_valid():
+            seeker_form.instance.save()
+            return JsonResponse({'message': 'Registration Successful!'}, status=201, safe=False)
+        else:
+            return JsonResponse({'message': seeker_form.errors}, status=422)
 
 
 # Login
