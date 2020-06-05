@@ -7,7 +7,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from .forms import UserForm
+from .forms import *
 from .helpers import json_body
 
 from .models import *
@@ -23,7 +23,6 @@ from .models import *
 class JobSeekerRegistration(View):
     def post(self, request):
         # getting api data
-        # body = json_body(request)
         seeker_form = UserForm(json_body(request))
         if seeker_form.is_valid():
             seeker_form.instance.save()
@@ -120,39 +119,14 @@ def personal_information(request):
 def create_personal_info(request):
     import json
     # getting api data
-    body_unicode = request.body.decode('utf-8')
-    body_data = json.loads(body_unicode)
+    user_personal_info = UserPersonalInfo(json_body(request))
 
-    first_name = body_data['first_name']
-    last_name = body_data['last_name']
-    mobile = body_data['mobile']
-    email = body_data['email']
-    father_name = body_data['father_name']
-    mother_name = body_data['mother_name']
-    gender = body_data['gender']
-    religion = body_data['religion']
-    nid = body_data['nid']
-    dob = body_data['dob']
-    user = body_data['user']
-    print(user)
-
-    custom_user = User.objects.get(id=user)
-    print(custom_user)
-
-    data = PersonalInfo.objects.create(
-        first_name=first_name,
-        last_name=last_name,
-        mobile=mobile,
-        email=email,
-        father_name=father_name,
-        mother_name=mother_name,
-        gender=gender,
-        religion=religion,
-        nid=nid,
-        dob=dob,
-        user=custom_user
-    )
-    return JsonResponse(str(data), safe=False)
+    # validation
+    if user_personal_info.is_valid():
+        user_personal_info.instance.save()
+        return JsonResponse({'message': 'Personal Info Successfully added '}, status=201, safe=False)
+    else:
+        return JsonResponse({'message': user_personal_info.errors}, status=422)
 
 
 # Update Personal Info
