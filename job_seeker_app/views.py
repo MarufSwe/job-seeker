@@ -1,26 +1,20 @@
 import json
-from pprint import pprint
-
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
-from django.forms import model_to_dict
 from .forms import PersonalsForm, AcademicForm, ProfessionalsForm
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-
 from django.views.decorators.http import require_http_methods
 
 from .models import (
     Personals,
     Professionals,
     Academics,
-    Degree,
     Token,
 )
-
 
 
 # Professionals API CRUD
@@ -37,7 +31,6 @@ class ViewProfessionals(View):
         else:
             return JsonResponse({"message": "Not Found!"}, status=404, safe=False)
 
-
     def post(self, request):
 
         body_unicode = request.body.decode('utf-8')
@@ -51,24 +44,21 @@ class ViewProfessionals(View):
         else:
             return JsonResponse({"message": "Not Found!"}, status=404, safe=False)
 
-
     def put(self, request, id=None):
         try:
             body_unicode = request.body.decode('utf-8')
             body = json.loads(body_unicode)
 
-            organization_name = body['organization_name']
-            organization_type = body['organization_type']
-            professionals = get_object_or_404(Professionals, id=id)
-            professionals.organization_name = organization_name
-            professionals.organization_type = organization_type
-            professionals.save()
+            professional_update_id = Professionals.objects.get(id=id)
+            form = ProfessionalsForm(body, instance=professional_update_id)
+
+            if form.is_valid():
+                form.save()
 
             return JsonResponse({"message": "Updated!"}, status=201, safe=False)
 
         except Professionals.DoesNotExist as e:
             return JsonResponse({"message": e}, status=404, safe=False)
-
 
     def delete(self, request, id):
         professionals = get_object_or_404(Professionals, id=id)
@@ -92,7 +82,6 @@ class ViewPersonals(View):
         else:
             return JsonResponse({"message": "Not Found!"}, status=404, safe=False)
 
-
     def post(self, request):
         body_unicode = request.body.decode('utf-8')
         body = json.loads(body_unicode)
@@ -105,13 +94,16 @@ class ViewPersonals(View):
         else:
             return JsonResponse({"message": "Not Found!"}, status=404, safe=False)
 
-
     def put(self, request, id=None):
         try:
             body_unicode = request.body.decode('utf-8')
             body = json.loads(body_unicode)
 
-            form = PersonalsForm(body)
+            personal_id = Personals.objects.get(id=id)
+
+            form = PersonalsForm(body, instance=personal_id)
+
+
             if form.is_valid():
                 instance = form.save()
 
@@ -154,20 +146,20 @@ class ViewAcademics(View):
         else:
             return JsonResponse({"errors": form.errors.as_json()}, status=422)
 
-
     def put(self, request, id=id):
         global form
         try:
             body_unicode = request.body.decode('utf-8')
             body = json.loads(body_unicode)
 
-            form = AcademicForm(body)
+            academic_id = Academics.objects.get(id=id)
+
+            form = AcademicForm(body, instance=academic_id)
             if form.is_valid():
                 instance = form.save()
                 return JsonResponse({'data': 'Update Academic info !'}, status=201, safe=False)
         except Academics.DoesNotExist as e:
             return JsonResponse({"errors": form.errors.as_json()}, status=404, safe=False)
-
 
     def delete(self, request, id=None):
         academics = get_object_or_404(Academics, id=id)

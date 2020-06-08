@@ -11,6 +11,7 @@ class Token(models.Model):
     def __str__(self):
         return str(self.token)
 
+
 # model Personals start
 class Personals(models.Model):
     class Gender(models.TextChoices):
@@ -46,8 +47,6 @@ class Personals(models.Model):
 
 
 # model Professionals start
-
-
 class Professionals(models.Model):
     class OrganizationType(models.TextChoices):
         GOVERNMENT = 'Government', _('GOVERNMENT')
@@ -101,8 +100,6 @@ def current_year():
 
 
 # model Academics start
-
-
 class Academics(models.Model):
     class Board(models.TextChoices):
         DHAKA = 'DHAKA', _('DHAKA')
@@ -128,19 +125,3 @@ class Academics(models.Model):
 
     def __str__(self):
         return self.board
-# model Academics end
-
-
-
-
-"""This code used for dynamic year field creation"""
-# import datetime
-#
-# def year_choices():
-#     return [(r, r) for r in range(1984, datetime.date.today().year + 1)]
-#
-# def current_year():
-#     return datetime.date.today().year
-#
-# class MyModel(models.Model):
-#     year = models.IntegerField(_('year'), choices=year_choices, default=current_year)

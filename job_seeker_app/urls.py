@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (
 
-ViewProfessionals,
+    ViewProfessionals,
     ViewPersonals,
     ViewAcademics
     # Authentication
@@ -23,11 +23,9 @@ urlpatterns = (
     path('api/professionals/<int:id>', ViewProfessionals.as_view()),
 
     path('api/personals/', ViewPersonals.as_view()),
-
     path('api/personals/<int:id>', ViewPersonals.as_view()),
 
     path('api/academics/', ViewAcademics.as_view()),
-
     path('api/academics/<int:id>', ViewAcademics.as_view()),
 
 )
