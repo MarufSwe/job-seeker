@@ -1,44 +1,33 @@
 from django.urls import path
-from . import views
 from .views import (
 
-    ViewProfessionalsList,
-    ViewProfessionalsAdd,
-    ViewProfessionalsUpdate,
-    ViewProfessionalsDelete,
-    ViewPersonalsList,
-    ViewPersonalsAdd,
-    ViewPersonalsUpdate,
-    ViewPersonalsDelete,
-    ViewAcademicsList,
-    ViewAcademicsAdd,
-    ViewAcademicsUpdate,
-    ViewAcademicsDelete,
+ViewProfessionals,
+    ViewPersonals,
+    ViewAcademics
+    # Authentication
 )
+
 from .views import login, logout, sign_up
 
-urlpatterns = [
+urlpatterns = (
     # sign-up api
     path('sign-up/', sign_up),
-
-    # login api
+    #
+    # # login api
     path('login/', login),
-
-    # logout api
+    #
+    # # logout api
     path('logout/', logout),
 
-    path('api/professionals-list/', ViewProfessionalsList.as_view()),
-    path('api/professionals-add/', ViewProfessionalsAdd.as_view()),
-    path('api/professionals-update/<int:id>', ViewProfessionalsUpdate.as_view()),
-    path('api/professionals-delete/<int:id>', ViewProfessionalsDelete.as_view()),
+    path('api/professionals/', ViewProfessionals.as_view()),
+    path('api/professionals/<int:id>', ViewProfessionals.as_view()),
 
-    path('api/personals-list/', ViewPersonalsList.as_view()),
-    path('api/personals-add/', ViewPersonalsAdd.as_view()),
-    path('api/personals-update/<int:id>', ViewPersonalsUpdate.as_view()),
-    path('api/personals-delete/<int:id>', ViewPersonalsDelete.as_view()),
-    path('api/academics-list/', ViewAcademicsList.as_view()),
-    path('api/academics-add/', ViewAcademicsAdd.as_view()),
-    path('api/academics-update/<int:id>', ViewAcademicsUpdate.as_view()),
-    path('api/academics-delete/<int:id>', ViewAcademicsDelete.as_view()),
+    path('api/personals/', ViewPersonals.as_view()),
 
-]
+    path('api/personals/<int:id>', ViewPersonals.as_view()),
+
+    path('api/academics/', ViewAcademics.as_view()),
+
+    path('api/academics/<int:id>', ViewAcademics.as_view()),
+
+)

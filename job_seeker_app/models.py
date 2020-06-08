@@ -92,6 +92,9 @@ class EducationLevel(models.Model):
 class Degree(models.Model):
     degree_name = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.degree_name
+
 
 def current_year():
     return datetime.date.today().year
