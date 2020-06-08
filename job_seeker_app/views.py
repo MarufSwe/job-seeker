@@ -1,6 +1,7 @@
 import json
 
 from django.contrib.auth import authenticate
+from django.forms import model_to_dict
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.utils.decorators import method_decorator
@@ -117,7 +118,6 @@ def personal_information(request):
 @csrf_exempt
 @require_http_methods(["POST"])
 def create_personal_info(request):
-    import json
     # getting api data
     user_personal_info = UserPersonalInfo(json_body(request))
 
@@ -133,59 +133,20 @@ def create_personal_info(request):
 # http://127.0.0.1:8000/update_per_info/
 @method_decorator(csrf_exempt, name='dispatch')
 class UpdatePersonalInfo(View):
-    def put(self, request, id=id):
-        try:
-            # getting api data
-            body_unicode = request.body.decode('utf-8')
-            body = json.loads(body_unicode)
+    def put(self, request, id=None):
 
-            first_name = body['first_name']
-            last_name = body['last_name']
-            mobile = body['mobile']
-            email = body['email']
-            father_name = body['father_name']
-            mother_name = body['mother_name']
-            gender = body['gender']
-            religion = body['religion']
-            nid = body['nid']
-            dob = body['dob']
+        # catch the editable id (object)
+        per_info_id = PersonalInfo.objects.get(id=id)
 
-            exist_per_info = get_object_or_404(PersonalInfo, id=id)
+        # getting api data
+        form = UpdateUserInfo(json_body(request), instance=per_info_id)
 
-            exist_per_info.first_name = first_name
-            exist_per_info.save()
-
-            exist_per_info.last_name = last_name
-            exist_per_info.save()
-
-            exist_per_info.mobile = mobile
-            exist_per_info.save()
-
-            exist_per_info.email = email
-            exist_per_info.save()
-
-            exist_per_info.father_name = father_name
-            exist_per_info.save()
-
-            exist_per_info.mother_name = mother_name
-            exist_per_info.save()
-
-            exist_per_info.gender = gender
-            exist_per_info.save()
-
-            exist_per_info.religion = religion
-            exist_per_info.save()
-
-            exist_per_info.nid = nid
-            exist_per_info.save()
-
-            exist_per_info.dob = dob
-            exist_per_info.save()
-
-            return JsonResponse({"message": "updated"}, status=201, safe=False)
-
-        except ProfessionalInfo.DoesNotExist as e:
-            return JsonResponse({"message": e}, status=404, safe=False)
+        # validation
+        if form.is_valid():
+            form.save()
+            return JsonResponse({"message": "Personal Info Updated!"}, status=201, safe=False)
+        else:
+            return JsonResponse({"message": form.errors}, status=404, safe=False)
 
 
 # Delete PersonalInfo
@@ -195,7 +156,9 @@ def delete_personal_info(request, id):
     personal_info = get_object_or_404(PersonalInfo, id=id)
     if request.method == "POST":
         personal_info.delete()
-    return JsonResponse({'massage': 'delete successfully'}, status=204)
+        return JsonResponse({'massage': 'Personal Info delete successfully'}, status=204)
+    else:
+        return JsonResponse({"message": personal_info.errors}, status=422)
 
 
 # ===============================================Professional Info===============================================
@@ -213,124 +176,35 @@ def professional_information(request):
 @csrf_exempt
 @require_http_methods(["POST"])
 def create_professional_info(request):
-    import json
-    body_unicode = request.body.decode('utf-8')
-    body_data = json.loads(body_unicode)
-    print(body_data)
+    # getting api data
+    user_professional_info = UserProfessionalInfo(json_body(request))
 
-    company_name = body_data['company_name']
-    company_type = body_data['company_type']
-    employee_id = body_data['employee_id']
-    designation = body_data['designation']
-    department = body_data['department']
-    responsibilities = body_data['responsibilities']
-    company_location = body_data['company_location']
-    employment_period = body_data['employment_period']
-    user = body_data['user']
-    print(user)
+    # validation
+    if user_professional_info.is_valid():
+        user_professional_info.instance.save()
+        return JsonResponse({"message": "Professional Info Successfully added"}, status=201, safe=False)
+    else:
+        return JsonResponse({"message": user_professional_info.errors}, status=422)
 
-    custom_user = User.objects.get(id=user)
-    print(custom_user)
-
-    data = ProfessionalInfo.objects.create(
-        company_name=company_name,
-        company_type=company_type,
-        employee_id=employee_id,
-        designation=designation,
-        department=department,
-        responsibilities=responsibilities,
-        company_location=company_location,
-        employment_period=employment_period,
-        user=custom_user
-    )
-    return JsonResponse(str(data), safe=False)
-
-
-# Update Professional Info
-# @csrf_exempt
-# @require_http_methods(["POST"])
-# def update_professional_info(request, id=None):
-#     # receiving API data
-#     # received_id = request.POST.get('id')
-#     company_name = request.POST.get('company_name')
-# company_type = request.POST.get('company_type')
-# employee_id = request.POST.get('employee_id')
-# designation = request.POST.get('designation')
-# department = request.POST.get('department')
-# responsibilities = request.POST.get('responsibilities')
-# company_location = request.POST.get('company_location')
-# employment_period = request.POST.get('employment_period')
-
-# if received_id:
-# exist_pro_info = ProfessionalInfo.objects.get(id=id)
-# updating object
-# exist_pro_info.company_name = company_name
-# exist_pro_info.save()
-# exist_pro_info.company_type = company_type
-# exist_pro_info.save()
-# exist_pro_info.employee_id = employee_id
-# exist_pro_info.save()
-# exist_pro_info.designation = designation
-# exist_pro_info.save()
-# exist_pro_info.department = department
-# exist_pro_info.save()
-# exist_pro_info.responsibilities = responsibilities
-# exist_pro_info.save()
-# exist_pro_info.company_location = company_location
-# exist_pro_info.save()
-# exist_pro_info.employment_period = employment_period
-# exist_pro_info.save()
-# print(existing_post.title, existing_post.body)
-# return JsonResponse({'message': exist_pro_info}, status=200)
 
 # Update Professional Info
 # http://127.0.0.1:8000/update_pro_info/
 @method_decorator(csrf_exempt, name='dispatch')
 class UpdateProfessionalInfo(View):
     def put(self, request, id=id):
-        try:
-            body_unicode = request.body.decode('utf-8')
-            body = json.loads(body_unicode)
 
-            company_name = body['company_name']
-            company_type = body['company_type']
-            employee_id = body['employee_id']
-            designation = body['designation']
-            department = body['department']
-            responsibilities = body['responsibilities']
-            company_location = body['company_location']
-            employment_period = body['employment_period']
+        # catch the editable id (object)
+        pro_info_id = ProfessionalInfo.objects.get(id=id)
 
-            exist_pro_info = get_object_or_404(ProfessionalInfo, id=id)
+        # getting api data
+        form = EditProfessionalInfo(json_body(request), instance=pro_info_id)
 
-            exist_pro_info.company_name = company_name
-            exist_pro_info.save()
-
-            exist_pro_info.company_type = company_type
-            exist_pro_info.save()
-
-            exist_pro_info.employee_id = employee_id
-            exist_pro_info.save()
-
-            exist_pro_info.designation = designation
-            exist_pro_info.save()
-
-            exist_pro_info.department = department
-            exist_pro_info.save()
-
-            exist_pro_info.responsibilities = responsibilities
-            exist_pro_info.save()
-
-            exist_pro_info.company_location = company_location
-            exist_pro_info.save()
-
-            exist_pro_info.employment_period = employment_period
-            exist_pro_info.save()
-
-            return JsonResponse({"message": "updated"}, status=201, safe=False)
-
-        except ProfessionalInfo.DoesNotExist as e:
-            return JsonResponse({"message": e}, status=404, safe=False)
+        # validation
+        if form.is_valid():
+            form.save()
+            return JsonResponse({"message": "Professional Info Updated!"}, status=201, safe=False)
+        else:
+            return JsonResponse({"message": form.errors}, status=404, safe=False)
 
 
 # Delete Professional Info
@@ -357,15 +231,15 @@ def degree_name(request):
 @csrf_exempt
 @require_http_methods(["POST"])
 def create_degree(request):
-    import json
-    body_unicode = request.body.decode('utf-8')
-    body_data = json.loads(body_unicode)
+    # getting api data
+    user_degree = UserDegree(json_body(request))
 
-    degree_name = body_data['degree_name']
-    data = Degree.objects.create(
-        degree_name=degree_name,
-    )
-    return JsonResponse(str(data), safe=False)
+    # validation
+    if user_degree.is_valid():
+        user_degree.instance.save()
+        return JsonResponse({'message': 'Degree added successfully'}, status=201, safe=False)
+    else:
+        return JsonResponse({'message': user_degree.errors}, status=422)
 
 
 # Update Degree
@@ -414,35 +288,15 @@ def academic_info_list(request):
 @csrf_exempt
 @require_http_methods(["POST"])
 def create_academic_info(request):
-    import json
-    body_unicode = request.body.decode('utf-8')
-    body_data = json.loads(body_unicode)
+    # get api data
+    user_academic_info = UserAcademicInfo(json_body(request))
 
-    result = body_data['result']
-    year_from = body_data['year_from']
-    year_to = body_data['year_to']
-    institute_name = body_data['institute_name']
-    degree = body_data['degree']
-    board = body_data['board']
-    user = body_data['user']
-
-    custom_user = User.objects.get(id=user)
-    print(custom_user)
-    foreign_degree = Degree.objects.get(id=degree)
-    print(degree)
-    board_name = Board.objects.get(id=board)
-    # print(board_name)
-
-    data = AcademicInfo.objects.create(
-        result=result,
-        year_from=year_from,
-        year_to=year_to,
-        institute_name=institute_name,
-        degree=foreign_degree,
-        board=board_name,
-        user=custom_user
-    )
-    return JsonResponse(str(data), safe=False)
+    # validation
+    if user_academic_info.is_valid():
+        user_academic_info.instance.save()
+        return JsonResponse({'message': 'Academic Info Added Successfully'}, status=201, safe=False)
+    else:
+        return JsonResponse({'message': user_academic_info.errors}, status=422)
 
 
 # Update Academic Info

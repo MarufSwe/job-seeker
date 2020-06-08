@@ -13,6 +13,10 @@ class Token(models.Model):
 
 
 class PersonalInfo(models.Model):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.errors = None
+
     first_name = models.CharField(max_length=25)
     last_name = models.CharField(max_length=25)
     mobile = models.CharField(max_length=14)
