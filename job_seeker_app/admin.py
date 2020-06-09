@@ -1,5 +1,12 @@
 from django.contrib import admin
-from .models import Personals, Professionals, EducationLevel, Degree, Academics, Token
+from .models import (
+    Personals,
+    Professionals,
+    EducationLevel,
+    Degree,
+    Academics,
+    Token
+)
 
 
 @admin.register(Token)
@@ -12,14 +19,20 @@ class ProfessionalAdmin(admin.ModelAdmin):
 
 
 class AcademicsAdmin(admin.ModelAdmin):
-    list_display = ['user_id', 'degree', 'board', 'institution', 'result','year']
+    list_display = ['user_id', 'degree', 'board', 'institution', 'result', 'year']
+
+
+class PersonalsAdmin(admin.ModelAdmin):
+    list_display = ['user_id', 'first_name', 'last_name', 'fathers_name', 'mothers_name', 'date_of_birth', 'email',
+                    'gender', 'religion', 'nid']
+
 
 class DegreeAdmin(admin.ModelAdmin):
     list_display = ['id', 'degree_name']
 
-admin.site.register(Personals)
+
+admin.site.register(Personals, PersonalsAdmin)
 admin.site.register(Professionals, ProfessionalAdmin)
 admin.site.register(EducationLevel)
 admin.site.register(Degree, DegreeAdmin)
 admin.site.register(Academics, AcademicsAdmin)
-

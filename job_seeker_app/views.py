@@ -1,7 +1,7 @@
 import json
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
-from .forms import PersonalsForm, AcademicForm, ProfessionalsForm
+from .forms import PersonalsForm, AcademicForm, ProfessionalsForm, DegreeForm
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
@@ -13,9 +13,59 @@ from .models import (
     Personals,
     Professionals,
     Academics,
+    Degree,
     Token,
 )
 
+
+@method_decorator(csrf_exempt, name='dispatch')
+class ViewDegree(View):
+    def get(self, request):
+        data = {
+            "degree_list": list(Degree.objects.values())
+        }
+
+        if data:
+            return JsonResponse(data, status=200, safe=False)
+        else:
+            return JsonResponse({"message": "Not Found!"}, status=404, safe=False)
+
+    def post(self, request):
+
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+
+        form = DegreeForm(body)
+
+        if form.is_valid():
+            form.save()
+            return JsonResponse({'message': 'Degree Info Added !'}, status=201, safe=False)
+        else:
+            return JsonResponse({"message": "Not Found!"}, status=404, safe=False)
+
+    def put(self, request, id=None):
+        try:
+            body_unicode = request.body.decode('utf-8')
+            body = json.loads(body_unicode)
+
+            degree_id = Degree.objects.get(id=id)
+            form = DegreeForm(body, instance=degree_id)
+
+            if form.is_valid():
+                form.save()
+
+            return JsonResponse({"message": "Updated!"}, status=201, safe=False)
+
+        except Professionals.DoesNotExist as e:
+            return JsonResponse({"message": e}, status=404, safe=False)
+
+    def delete(self, request, id):
+        degree = get_object_or_404(Degree, id=id)
+        if degree:
+            degree.delete()
+            return JsonResponse({"message": "Deleted!"}, status=200, safe=False)
+        else:
+            return JsonResponse({"message": "Not Found!"}, status=404, safe=False)
 
 # Professionals API CRUD
 
@@ -102,7 +152,6 @@ class ViewPersonals(View):
             personal_id = Personals.objects.get(id=id)
 
             form = PersonalsForm(body, instance=personal_id)
-
 
             if form.is_valid():
                 instance = form.save()

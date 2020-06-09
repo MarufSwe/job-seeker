@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Personals, Professionals, Academics
+from .models import Personals, Professionals, Academics, Degree
 
 
 class UserForm(forms.ModelForm):
@@ -27,7 +27,9 @@ class AcademicForm(forms.ModelForm):
         # fields ="__all__"
         fields = ['board', 'degree', 'institution', 'result', 'year', 'user_id']
 
-    # def __init__(self, *args, **kwargs):
-    #     user = kwargs.pop('user', '')
-    #     super(AcademicForm, self).__init__(*args, **kwargs)
-    #     self.fields['user_defined_code'] = forms.ModelChoiceField(queryset=User.objects.filter(owner=user))
+
+
+class DegreeForm(forms.ModelForm):
+    class Meta:
+        model = Degree
+        fields = "__all__"

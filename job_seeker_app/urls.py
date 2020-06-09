@@ -3,7 +3,8 @@ from .views import (
 
     ViewProfessionals,
     ViewPersonals,
-    ViewAcademics
+    ViewAcademics,
+    ViewDegree,
     # Authentication
 )
 
@@ -18,6 +19,9 @@ urlpatterns = (
     #
     # # logout api
     path('logout/', logout),
+
+path('api/degree/', ViewDegree.as_view()),
+    path('api/degree/<int:id>', ViewDegree.as_view()),
 
     path('api/professionals/', ViewProfessionals.as_view()),
     path('api/professionals/<int:id>', ViewProfessionals.as_view()),
