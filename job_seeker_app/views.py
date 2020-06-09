@@ -24,7 +24,7 @@ from .models import *
 class JobSeekerRegistration(View):
     def post(self, request):
         # getting api data
-        seeker_form = UserForm(json_body(request))
+        seeker_form = UserRegistration(json_body(request))
         if seeker_form.is_valid():
             seeker_form.instance.save()
             return JsonResponse({'message': 'Registration Successful!'}, status=201, safe=False)
@@ -119,7 +119,7 @@ def personal_information(request):
 @require_http_methods(["POST"])
 def create_personal_info(request):
     # getting api data
-    user_personal_info = UserPersonalInfo(json_body(request))
+    user_personal_info = AddPersonalInfo(json_body(request))
 
     # validation
     if user_personal_info.is_valid():
@@ -139,7 +139,7 @@ class UpdatePersonalInfo(View):
         per_info_id = PersonalInfo.objects.get(id=id)
 
         # getting api data
-        form = UpdateUserInfo(json_body(request), instance=per_info_id)
+        form = EditPersonalInfo(json_body(request), instance=per_info_id)
 
         # validation
         if form.is_valid():
@@ -177,7 +177,7 @@ def professional_information(request):
 @require_http_methods(["POST"])
 def create_professional_info(request):
     # getting api data
-    user_professional_info = UserProfessionalInfo(json_body(request))
+    user_professional_info = AddProfessionalInfo(json_body(request))
 
     # validation
     if user_professional_info.is_valid():
@@ -232,7 +232,7 @@ def degree_name(request):
 @require_http_methods(["POST"])
 def create_degree(request):
     # getting api data
-    user_degree = UserDegree(json_body(request))
+    user_degree = AddDegree(json_body(request))
 
     # validation
     if user_degree.is_valid():
@@ -247,21 +247,19 @@ def create_degree(request):
 @method_decorator(csrf_exempt, name='dispatch')
 class UpdateDegree(View):
     def put(self, request, id=id):
-        try:
-            body_unicode = request.body.decode('utf-8')
-            body = json.loads(body_unicode)
 
-            degree_name = body['degree_name']
+        # catch the editable id (object)
+        degree_id = Degree.objects.get(id=id)
 
-            exist_degree = get_object_or_404(Degree, id=id)
+        # getting api data
+        form = EditDegree(json_body(request), instance=degree_id)
 
-            exist_degree.degree_name = degree_name
-            exist_degree.save()
-
-            return JsonResponse({"message": "updated"}, status=201, safe=False)
-
-        except Degree.DoesNotExist as e:
-            return JsonResponse({"message": e}, status=404, safe=False)
+        # validation
+        if form.is_valid():
+            form.save()
+            return JsonResponse({"message": "Degree Successfully Updated"}, status=201, safe=False)
+        else:
+            return JsonResponse({"message": form.errors}, status=422)
 
 
 # Delete Degree
@@ -289,7 +287,7 @@ def academic_info_list(request):
 @require_http_methods(["POST"])
 def create_academic_info(request):
     # get api data
-    user_academic_info = UserAcademicInfo(json_body(request))
+    user_academic_info = AddAcademicInfo(json_body(request))
 
     # validation
     if user_academic_info.is_valid():
@@ -304,33 +302,19 @@ def create_academic_info(request):
 @method_decorator(csrf_exempt, name='dispatch')
 class UpdateAcademicInfo(View):
     def put(self, request, id=id):
-        try:
-            body_unicode = request.body.decode('utf-8')
-            body = json.loads(body_unicode)
 
-            result = body['result']
-            year_from = body['year_from']
-            year_to = body['year_to']
-            institute_name = body['institute_name']
+        # catch editable academic id
+        academic_id = AcademicInfo.objects.get(id=id)
 
-            exist_academic = get_object_or_404(AcademicInfo, id=id)
+        # getting api data
+        form = EditAcademicInfo(json_body(request), instance=academic_id)
 
-            exist_academic.result = result
-            exist_academic.save()
-
-            exist_academic.year_from = year_from
-            exist_academic.save()
-
-            exist_academic.year_to = year_to
-            exist_academic.save()
-
-            exist_academic.institute_name = institute_name
-            exist_academic.save()
-
-            return JsonResponse({"message": "updated"}, status=201, safe=False)
-
-        except AcademicInfo.DoesNotExist as e:
-            return JsonResponse({"message": e}, status=404, safe=False)
+        # validation
+        if form.is_valid():
+            form.save()
+            return JsonResponse({"message": "Academic Info Updated Successfully"}, status=201, safe=False)
+        else:
+            return JsonResponse({"message": form.errors}, status=422)
 
 
 # Delete Academic info
