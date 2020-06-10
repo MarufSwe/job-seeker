@@ -85,11 +85,14 @@ class Professionals(models.Model):
 
 
 class EducationLevel(models.Model):
-    edu_level_name = models.CharField(max_length=100)
+    edu_level_name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.edu_level_name
 
 
 class Degree(models.Model):
-    degree_name = models.CharField(max_length=100)
+    degree_name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.degree_name
