@@ -31,7 +31,8 @@ def getModelData(self, request):
     body = json.loads(body_unicode)
     return body
 
-
+# EducationLevel API CR
+# EducationLevel read(get),create(post):http://127.0.0.1:8000/seeker/api/education-level/
 @method_decorator(csrf_exempt, name='dispatch')
 class ViewEducationLevel(View):
     def get(self, request):
@@ -44,11 +45,7 @@ class ViewEducationLevel(View):
             return JsonResponse({"message": "Not Found!"}, status=404, safe=False)
 
     def post(self, request):
-
-        # body_unicode = request.body.decode('utf-8')
-        # body = json.loads(body_unicode)
         body = getModelData(self, request)
-
         form = EducationLevelForm(body)
 
         if form.is_valid():
@@ -57,7 +54,9 @@ class ViewEducationLevel(View):
         else:
             return JsonResponse({"message": "Not Found!"}, status=404, safe=False)
 
-
+# Degree API CRUD
+# Degree Details(get),create(post):http://127.0.0.1:8000/seeker/api/degree/
+# Degree Update(update),Delete(delete):http://127.0.0.1:8000/seeker/api/degree/
 @method_decorator(csrf_exempt, name='dispatch')
 class ViewDegree(View):
     def get(self, request):
@@ -71,11 +70,7 @@ class ViewDegree(View):
             return JsonResponse({"message": "Not Found!"}, status=404, safe=False)
 
     def post(self, request):
-
-        # body_unicode = request.body.decode('utf-8')
-        # body = json.loads(body_unicode)
         body = getModelData(self, request)
-
         form = DegreeForm(body)
 
         if form.is_valid():
@@ -86,10 +81,7 @@ class ViewDegree(View):
 
     def put(self, request, id=None):
         try:
-            # body_unicode = request.body.decode('utf-8')
-            # body = json.loads(body_unicode)
             body = getModelData(self, request)
-
             degree_id = Degree.objects.get(id=id)
             form = DegreeForm(body, instance=degree_id)
 
@@ -111,7 +103,8 @@ class ViewDegree(View):
 
 
 # Professionals API CRUD
-
+# Profession Details(get),Create(post):http://127.0.0.1:8000/seeker/api/professionals/
+# Profession Update(put),Delete(delete):http://127.0.0.1:8000/seeker/api/professionals/id
 @method_decorator(csrf_exempt, name='dispatch')
 class ViewProfessionals(View):
     def get(self, request):
@@ -125,11 +118,7 @@ class ViewProfessionals(View):
             return JsonResponse({"message": "Not Found!"}, status=404, safe=False)
 
     def post(self, request):
-
-        # body_unicode = request.body.decode('utf-8')
-        # body = json.loads(body_unicode)
         body = getModelData(self, request)
-
         form = ProfessionalsForm(body)
 
         if form.is_valid():
@@ -140,16 +129,12 @@ class ViewProfessionals(View):
 
     def put(self, request, id=None):
         try:
-            # body_unicode = request.body.decode('utf-8')
-            # body = json.loads(body_unicode)
             body = getModelData(self, request)
-
             professional_update_id = Professionals.objects.get(id=id)
             form = ProfessionalsForm(body, instance=professional_update_id)
 
             if form.is_valid():
                 form.save()
-
             return JsonResponse({"message": "Updated!"}, status=201, safe=False)
 
         except Professionals.DoesNotExist as e:
@@ -165,6 +150,8 @@ class ViewProfessionals(View):
 
 
 # Personals API CRUD
+# Personal Details(get), Create personal (post) :http://127.0.0.1:8000/seeker/api/personals/
+# Personal Update(update), Delete personal (delete) :http://127.0.0.1:8000/seeker/api/personals/id
 @method_decorator(csrf_exempt, name='dispatch')
 class ViewPersonals(View):
     def get(self, request):
@@ -178,22 +165,17 @@ class ViewPersonals(View):
             return JsonResponse({"message": "Not Found!"}, status=404, safe=False)
 
     def post(self, request):
-        # body_unicode = request.body.decode('utf-8')
-        # body = json.loads(body_unicode)
         body = getModelData(self, request)
-
         form = PersonalsForm(body)
+
         if form.is_valid():
             form.save()
-
             return JsonResponse({'message': 'Personal Info Added !'}, status=201, safe=False)
         else:
             return JsonResponse({"message": "Not Found!"}, status=404, safe=False)
 
     def put(self, request, id=None):
         try:
-            # body_unicode = request.body.decode('utf-8')
-            # body = json.loads(body_unicode)
             body = getModelData(self, request)
 
             personal_id = Personals.objects.get(id=id)
@@ -202,7 +184,6 @@ class ViewPersonals(View):
 
             if form.is_valid():
                 form.save()
-
             return JsonResponse({"message": "Updated!"}, status=201, safe=False)
 
         except Personals.DoesNotExist as e:
@@ -210,6 +191,7 @@ class ViewPersonals(View):
 
     def delete(self, request, id=None):
         personals = get_object_or_404(Personals, id=id)
+
         if personals:
             personals.delete()
             return JsonResponse({"message": "Deleted!"}, status=200, safe=False)
@@ -218,6 +200,8 @@ class ViewPersonals(View):
 
 
 # Academics CRUD
+# Academics Details(get), create(post):http://127.0.0.1:8000/seeker/api/academics/
+# Academics Update(update), delete(delete):http://127.0.0.1:8000/seeker/api/academics/id
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ViewAcademics(View):
@@ -232,11 +216,9 @@ class ViewAcademics(View):
             return JsonResponse({"message": "Not Found!"}, status=404, safe=False)
 
     def post(self, request):
-        # body_unicode = request.body.decode('utf-8')
-        # body = json.loads(body_unicode)
         body = getModelData(self, request)
-
         form = AcademicForm(body)
+
         if form.is_valid():
             form.save()
             return JsonResponse({'data': 'Academics Info Added !'}, status=201, safe=False)
@@ -244,17 +226,13 @@ class ViewAcademics(View):
             return JsonResponse({"errors": form.errors.as_json()}, status=422)
 
     def put(self, request, id=id):
-        global form
         try:
-            # body_unicode = request.body.decode('utf-8')
-            # body = json.loads(body_unicode)
             body = getModelData(self, request)
-
             academic_id = Academics.objects.get(id=id)
-
             form = AcademicForm(body, instance=academic_id)
+
             if form.is_valid():
-                instance = form.save()
+                form.save()
                 return JsonResponse({'data': 'Update Academic info !'}, status=201, safe=False)
         except Academics.DoesNotExist as e:
             return JsonResponse({"errors": form.errors.as_json()}, status=404, safe=False)
