@@ -1,7 +1,6 @@
 import json
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
-from .forms import PersonalsForm, AcademicForm, ProfessionalsForm, DegreeForm
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
@@ -9,13 +8,54 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
+from .forms import (
+    AcademicForm,
+    ProfessionalsForm,
+    PersonalsForm,
+    DegreeForm,
+    EducationLevelForm,
+)
+
 from .models import (
     Personals,
     Professionals,
     Academics,
+    EducationLevel,
     Degree,
     Token,
 )
+
+
+def getModelData(self, request):
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    return body
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class ViewEducationLevel(View):
+    def get(self, request):
+        data = {
+            "education_list": list(EducationLevel.objects.values())
+        }
+        if data:
+            return JsonResponse(data, status=200, safe=False)
+        else:
+            return JsonResponse({"message": "Not Found!"}, status=404, safe=False)
+
+    def post(self, request):
+
+        # body_unicode = request.body.decode('utf-8')
+        # body = json.loads(body_unicode)
+        body = getModelData(self, request)
+
+        form = EducationLevelForm(body)
+
+        if form.is_valid():
+            form.save()
+            return JsonResponse({'message': 'EducationLevelForm Info Added !'}, status=201, safe=False)
+        else:
+            return JsonResponse({"message": "Not Found!"}, status=404, safe=False)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -32,8 +72,9 @@ class ViewDegree(View):
 
     def post(self, request):
 
-        body_unicode = request.body.decode('utf-8')
-        body = json.loads(body_unicode)
+        # body_unicode = request.body.decode('utf-8')
+        # body = json.loads(body_unicode)
+        body = getModelData(self, request)
 
         form = DegreeForm(body)
 
@@ -45,8 +86,9 @@ class ViewDegree(View):
 
     def put(self, request, id=None):
         try:
-            body_unicode = request.body.decode('utf-8')
-            body = json.loads(body_unicode)
+            # body_unicode = request.body.decode('utf-8')
+            # body = json.loads(body_unicode)
+            body = getModelData(self, request)
 
             degree_id = Degree.objects.get(id=id)
             form = DegreeForm(body, instance=degree_id)
@@ -67,6 +109,7 @@ class ViewDegree(View):
         else:
             return JsonResponse({"message": "Not Found!"}, status=404, safe=False)
 
+
 # Professionals API CRUD
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -83,8 +126,9 @@ class ViewProfessionals(View):
 
     def post(self, request):
 
-        body_unicode = request.body.decode('utf-8')
-        body = json.loads(body_unicode)
+        # body_unicode = request.body.decode('utf-8')
+        # body = json.loads(body_unicode)
+        body = getModelData(self, request)
 
         form = ProfessionalsForm(body)
 
@@ -96,8 +140,9 @@ class ViewProfessionals(View):
 
     def put(self, request, id=None):
         try:
-            body_unicode = request.body.decode('utf-8')
-            body = json.loads(body_unicode)
+            # body_unicode = request.body.decode('utf-8')
+            # body = json.loads(body_unicode)
+            body = getModelData(self, request)
 
             professional_update_id = Professionals.objects.get(id=id)
             form = ProfessionalsForm(body, instance=professional_update_id)
@@ -133,12 +178,13 @@ class ViewPersonals(View):
             return JsonResponse({"message": "Not Found!"}, status=404, safe=False)
 
     def post(self, request):
-        body_unicode = request.body.decode('utf-8')
-        body = json.loads(body_unicode)
+        # body_unicode = request.body.decode('utf-8')
+        # body = json.loads(body_unicode)
+        body = getModelData(self, request)
 
         form = PersonalsForm(body)
         if form.is_valid():
-            instance = form.save()
+            form.save()
 
             return JsonResponse({'message': 'Personal Info Added !'}, status=201, safe=False)
         else:
@@ -146,15 +192,16 @@ class ViewPersonals(View):
 
     def put(self, request, id=None):
         try:
-            body_unicode = request.body.decode('utf-8')
-            body = json.loads(body_unicode)
+            # body_unicode = request.body.decode('utf-8')
+            # body = json.loads(body_unicode)
+            body = getModelData(self, request)
 
             personal_id = Personals.objects.get(id=id)
 
             form = PersonalsForm(body, instance=personal_id)
 
             if form.is_valid():
-                instance = form.save()
+                form.save()
 
             return JsonResponse({"message": "Updated!"}, status=201, safe=False)
 
@@ -185,8 +232,9 @@ class ViewAcademics(View):
             return JsonResponse({"message": "Not Found!"}, status=404, safe=False)
 
     def post(self, request):
-        body_unicode = request.body.decode('utf-8')
-        body = json.loads(body_unicode)
+        # body_unicode = request.body.decode('utf-8')
+        # body = json.loads(body_unicode)
+        body = getModelData(self, request)
 
         form = AcademicForm(body)
         if form.is_valid():
@@ -198,8 +246,9 @@ class ViewAcademics(View):
     def put(self, request, id=id):
         global form
         try:
-            body_unicode = request.body.decode('utf-8')
-            body = json.loads(body_unicode)
+            # body_unicode = request.body.decode('utf-8')
+            # body = json.loads(body_unicode)
+            body = getModelData(self, request)
 
             academic_id = Academics.objects.get(id=id)
 

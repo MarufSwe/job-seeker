@@ -5,6 +5,7 @@ from .views import (
     ViewPersonals,
     ViewAcademics,
     ViewDegree,
+    ViewEducationLevel,
     # Authentication
 )
 
@@ -20,7 +21,9 @@ urlpatterns = (
     # # logout api
     path('logout/', logout),
 
-path('api/degree/', ViewDegree.as_view()),
+    path('api/education-level/', ViewEducationLevel.as_view()),
+
+    path('api/degree/', ViewDegree.as_view()),
     path('api/degree/<int:id>', ViewDegree.as_view()),
 
     path('api/professionals/', ViewProfessionals.as_view()),

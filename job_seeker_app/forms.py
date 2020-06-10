@@ -1,6 +1,13 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Personals, Professionals, Academics, Degree
+from .models import (
+    EducationLevel,
+    Personals,
+    Professionals,
+    Academics,
+    Degree,
+
+)
 
 
 class UserForm(forms.ModelForm):
@@ -28,8 +35,13 @@ class AcademicForm(forms.ModelForm):
         fields = ['board', 'degree', 'institution', 'result', 'year', 'user_id']
 
 
-
 class DegreeForm(forms.ModelForm):
     class Meta:
         model = Degree
+        fields = "__all__"
+
+
+class EducationLevelForm(forms.ModelForm):
+    class Meta:
+        model = EducationLevel
         fields = "__all__"
